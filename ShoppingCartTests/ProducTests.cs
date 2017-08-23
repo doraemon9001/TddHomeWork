@@ -59,7 +59,7 @@ namespace ShoppingCartTests
             act.ShouldThrow<ArgumentException>();
         }
         [TestMethod]
-        public void 驗證Products_筆數若輸入為0_則傳回0()
+        public void 驗證Products_筆數若輸入為0_則傳回0_待修正()
         {
             decimal expected = _Product.GetSum(0, 4, product => product.Revenue);
             decimal actual = 0;

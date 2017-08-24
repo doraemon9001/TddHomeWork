@@ -6,14 +6,12 @@ using ExpectedObjects;
 using FluentAssertions;
 using FluentAssertions.Common;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NSubstitute;
 
 namespace ShoppingCartTests
 {
     [TestClass]
     public class ProgramTests
     {
-        private static List<Product> _Products { get; set; }
         private static Product _Product { get; set; }
 
         [ClassInitialize]
@@ -49,7 +47,7 @@ namespace ShoppingCartTests
         [TestMethod]
         public void 驗證Products_筆數輸入負數_會拋_ArgumentException()
         {
-            Action act = () => _Product.GetSum(-11, 4, product => product.Revenue);
+            Action act = () => _Product.GetSum(1, -11, product => product.Revenue);
             act.ShouldThrow<ArgumentException>();
         }
         [TestMethod]
@@ -59,11 +57,11 @@ namespace ShoppingCartTests
             act.ShouldThrow<ArgumentException>();
         }
         [TestMethod]
-        public void 驗證Products_筆數若輸入為0_則傳回0_待修正()
+        public void 驗證Products_筆數若輸入為0_則傳回0()
         {
-            decimal expected = _Product.GetSum(0, 4, product => product.Revenue);
+            decimal expected = _Product.GetSum(1, 0, product => product.Revenue);
             decimal actual = 0;
-            expected.ToExpectedObject().ShouldEqual(actual);
+            Assert.AreEqual(expected, actual);
         }
     }
 
@@ -74,25 +72,33 @@ namespace ShoppingCartTests
         public decimal Revenue { get; set; }
         public decimal SellPrice { get; set; }
 
-        List<Product> Products => new List<Product>
-        {
-            new Product { Id = 1,  Cost = 1,  Revenue = 11, SellPrice = 21 },
-            new Product { Id = 2,  Cost = 2,  Revenue = 12, SellPrice = 22 },
-            new Product { Id = 3,  Cost = 3,  Revenue = 13, SellPrice = 23 },
-            new Product { Id = 4,  Cost = 4,  Revenue = 14, SellPrice = 24 },
-            new Product { Id = 5,  Cost = 5,  Revenue = 15, SellPrice = 25 },
-            new Product { Id = 6,  Cost = 6,  Revenue = 16, SellPrice = 26 },
-            new Product { Id = 7,  Cost = 7,  Revenue = 17, SellPrice = 27 },
-            new Product { Id = 8,  Cost = 8,  Revenue = 18, SellPrice = 28 },
-            new Product { Id = 9,  Cost = 9,  Revenue = 19, SellPrice = 29 },
-            new Product { Id = 10, Cost = 10, Revenue = 20, SellPrice = 30 },
-            new Product { Id = 11, Cost = 11, Revenue = 21, SellPrice = 31 }
-        };
 
-        public decimal GetSum(int count, int size, Func<Product, decimal> selector)
+        public List<Product> Products
         {
-            if (count < 0) throw new ArgumentException();
-            return  Products.Skip(count).Take(size).Sum(selector);
+            get
+            {
+                return new List<Product>
+                {
+                    new Product { Id = 1,  Cost = 1,  Revenue = 11, SellPrice = 21 },
+                    new Product { Id = 2,  Cost = 2,  Revenue = 12, SellPrice = 22 },
+                    new Product { Id = 3,  Cost = 3,  Revenue = 13, SellPrice = 23 },
+                    new Product { Id = 4,  Cost = 4,  Revenue = 14, SellPrice = 24 },
+                    new Product { Id = 5,  Cost = 5,  Revenue = 15, SellPrice = 25 },
+                    new Product { Id = 6,  Cost = 6,  Revenue = 16, SellPrice = 26 },
+                    new Product { Id = 7,  Cost = 7,  Revenue = 17, SellPrice = 27 },
+                    new Product { Id = 8,  Cost = 8,  Revenue = 18, SellPrice = 28 },
+                    new Product { Id = 9,  Cost = 9,  Revenue = 19, SellPrice = 29 },
+                    new Product { Id = 10, Cost = 10, Revenue = 20, SellPrice = 30 },
+                    new Product { Id = 11, Cost = 11, Revenue = 21, SellPrice = 31 }
+                };
+            }
+        }
+
+        public decimal GetSum(int index, int size, Func<Product, decimal> selector)
+        {
+            if (size < 0) throw new ArgumentException();
+            if (size == 0) index = 0;
+            return Products.Skip(index).Take(size).Sum(selector);
         }
 
         public string GetField(string fieldName)
